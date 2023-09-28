@@ -11,7 +11,7 @@ namespace PickSomethingForMeApi.Controllers
     {
 
         private readonly ApplicationDbContext _context;
-
+        
         public ActivityController(ApplicationDbContext context)
         {
             _context = context;
