@@ -16,6 +16,10 @@ public class RoomController : ControllerBase
         _context = context;
     }
     // GET: api/RoomController
+    /// <summary>
+    /// Gets A list of all rooms
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Room>>> GetRooms()
     {
@@ -25,26 +29,71 @@ public class RoomController : ControllerBase
 
     // GET api/RoomController/5
     [HttpGet("{id}")]
-    public string Get(int id)
+    public async Task<ActionResult<Room>> GetRoom(int id)
     {
-        return "value";
+        var room = await _context.Rooms.FindAsync(id);
+
+        if (room == null)
+        {
+            return NotFound(); // creates 404 not found
+        }
+
+        return Ok(room);
     }
 
     // POST api/RoomController
     [HttpPost]
-    public void Post([FromBody] string value)
+    public async Task<ActionResult<Room>> CreateRoom(Room room)
     {
+        _context.Rooms.Add(room);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetRoom), new { id = room.Id }, room); //Status 201 Create response 
     }
 
     // PUT api/RoomController/5
     [HttpPut("{id}")]
-    public void Put(int id, [FromBody] string value)
+    public async Task<IActionResult> UpdateRoom(int id, Room room)
     {
-    }
+        if (id != room.Id)
+        {
+            return BadRequest();
+        }
 
+        _context.Entry(room).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!RoomExists(id))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+        return NoContent(); // Status 204 nocontent
+    }
     // DELETE api/RoomController/5
     [HttpDelete("{id}")]
-    public void Delete(int id)
+    public async Task<IActionResult> DeleteRoom(int id)
     {
+        var room = await _context.Rooms.FindAsync(id);
+        if (room == null)
+        {
+            return NotFound();
+        }
+        _context.Rooms.Remove(room);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+    private bool RoomExists(int id)
+    {
+        return _context.Rooms.Any(e => e.Id == id);
     }
 }
