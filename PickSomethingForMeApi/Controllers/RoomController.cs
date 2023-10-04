@@ -42,12 +42,20 @@ public class RoomController : ControllerBase
     }
 
     // POST api/RoomController
-    [HttpPost]
-    public async Task<ActionResult<Room>> CreateRoom(Room room)
+    [HttpPost("CreateRoomAndUser")]
+    public async Task<ActionResult<RoomAndUserRequest>> CreateRoomAndUser(RoomAndUserRequest request)
     {
+        //Create Room
+        var room = new Room { RoomName = request.RoomName };
         _context.Rooms.Add(room);
         await _context.SaveChangesAsync();
+        //Create User and add room
+        var user = new User { UserName = request.UserName, RoomId = room.Id};
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
 
+        room.Users.Add(user);
+        user.Room = room;
         return CreatedAtAction(nameof(GetRoom), new { id = room.Id }, room); //Status 201 Create response 
     }
 
