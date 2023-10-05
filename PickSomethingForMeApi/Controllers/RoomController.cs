@@ -43,8 +43,14 @@ public class RoomController : ControllerBase
 
     // POST api/RoomController
     [HttpPost("CreateRoomAndUser")]
-    public async Task<ActionResult<RoomAndUserRequest>> CreateRoomAndUser(RoomAndUserRequest request)
+    public async Task<ActionResult<RoomAndUserRequest>> CreateRoomAndUser([FromBody] RoomAndUserRequest request)
     {
+
+        // Validate request and process accordingly
+        if (request == null)
+        {
+            return BadRequest("Invalid request. Please provide a valid request body.");
+        }
         //Create Room
         var room = new Room
         {
@@ -52,7 +58,6 @@ public class RoomController : ControllerBase
             Users = new List<User>(),
             Activities = new List<Activity>()
         };
-        await _context.SaveChangesAsync();
         //Create User and add room
         var user = new User {
             UserName = request.UserName,
@@ -115,3 +120,4 @@ public class RoomController : ControllerBase
         return _context.Rooms.Any(e => e.Id == id);
     }
 }
+ 

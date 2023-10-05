@@ -3,42 +3,38 @@ import axios from 'axios';
 import Header from './Header';
 import '../styles/styles.scss';
 
-const CreateRoomPage: React.FC = () => {
+function CreateRoomAndUserPage()  {
 
-  //State 
-    const [username, setUsername] = useState('');
-    const [roomNumber, setRoomNumber] = useState('');
-    const [room, setRoom] = useState({
-      roomName: '',
-      users: [],
-      activites: []
-        });
+    const [userName, setUsername] = useState('');
+    const [roomName, setRoomName] = useState('');
+    const apiUrl = 'https://localhost:7247/api/Room/CreateRoomAndUser'; //local
 
-    const [roomId, setRoomId] = useState('');
-
-  // Function to handle when the "Create Room" button is clicked
-  const handleCreateRoomClick = async () => {
-    // Validate username and room number
-    if (username.trim() === '' || roomNumber.trim() === '') {
-      alert('Please enter a username and room number.');
+  const handleCreateRoomAndUser = async () => {
+    //Validate Inputs
+    if (userName.trim() === '' || roomName.trim() === '') {
+      alert('Please enter a username and a room name.');
       return;
     }
-
-    // TODO: Implement the logic to create a room
     try {
-      const response = await axios.post('api/RoomController');
-    }
-  };
+      const roomAndUserRequest = {
+        UserName: userName,
+        roomName: roomName
+      };
 
-  // Function to handle when the "Join Room" button is clicked
-  const handleJoinRoomClick = () => {
-    // Validate username and room number
-    if (username.trim() === '' || roomNumber.trim() === '') {
-      alert('Please enter a username and room number.');
-      return;
-    }
+      const response = await axios.post(apiUrl, roomAndUserRequest,{
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-    // TODO: Implement the logic to join a room
+      console.log('Response from backend:', response.data);
+
+      setUsername('');
+      setRoomName(''); 
+    } catch (error) {
+      console.error('Error:', error);
+
+    }
   };
 return  (
   <div className="container mx-auto p-4">
@@ -48,7 +44,7 @@ return  (
     <input
       type="text"
       placeholder="Enter your username"
-      value={username}
+      value={userName}
       onChange={(e) => setUsername(e.target.value)}
       className="w-full mb-4 p-2 border border-gray-300 rounded"
     />
@@ -56,31 +52,25 @@ return  (
     {/* Room number input */}
     <input
       type="text"
-      placeholder="Enter room number"
-      value={roomNumber}
-      onChange={(e) => setRoomNumber(e.target.value)}
+      placeholder="Enter room name" 
+      value={roomName}
+      onChange={(e) => setRoomName(e.target.value)}
       className="w-full mb-4 p-2 border border-gray-300 rounded"
     />
 
     {/* Create Room button */}
     <button
-      onClick={handleCreateRoomClick}
+      onClick={handleCreateRoomAndUser}
       className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-4"
     >
       Create Room
     </button>
 
-    {/* Join Room button */}
-    <button
-      onClick={handleJoinRoomClick}
-      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
-    >
-      Join Room
-    </button>
-  </div>
+    {/* TODO: add join room button */}
+</div>
 );
 };
 
 
   
-  export default CreateRoomPage;
+  export default CreateRoomAndUserPage;
