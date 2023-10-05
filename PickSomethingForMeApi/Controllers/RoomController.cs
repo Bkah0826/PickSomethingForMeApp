@@ -46,16 +46,26 @@ public class RoomController : ControllerBase
     public async Task<ActionResult<RoomAndUserRequest>> CreateRoomAndUser(RoomAndUserRequest request)
     {
         //Create Room
-        var room = new Room { RoomName = request.RoomName };
-        _context.Rooms.Add(room);
+        var room = new Room
+        {
+            RoomName = request.RoomName,
+            Users = new List<User>(),
+            Activities = new List<Activity>()
+        };
         await _context.SaveChangesAsync();
         //Create User and add room
-        var user = new User { UserName = request.UserName, RoomId = room.Id};
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        var user = new User {
+            UserName = request.UserName,
+        };
 
         room.Users.Add(user);
         user.Room = room;
+
+        _context.Rooms.Add(room);
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+
         return CreatedAtAction(nameof(GetRoom), new { id = room.Id }, room); //Status 201 Create response 
     }
 
